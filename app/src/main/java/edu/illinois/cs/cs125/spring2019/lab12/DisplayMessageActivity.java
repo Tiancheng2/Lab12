@@ -19,6 +19,18 @@ import com.google.gson.JsonParser;
  */
 public class DisplayMessageActivity extends AppCompatActivity {
     /**
+     * comment.
+     */
+    private int counter = 0;
+    /**
+     * comment.
+     */
+    private final int max = 50;
+    /**
+     * comment.
+     */
+    private final int constant = 0;
+    /**
      * parse json given by api.
      * @param json
      * comment.
@@ -45,54 +57,76 @@ public class DisplayMessageActivity extends AppCompatActivity {
     }
 
     /**
-     * determine if the answer is correct.
+     * return array of questions.
      * @param json
      * comment.
+     * @return
+     * comment.
      */
-    public void getQuestion(final String json) {
+    public String[] getQuestion(final String json) {
         JsonParser jsonParser = new JsonParser();
         JsonObject parsed = jsonParser.parse(json).getAsJsonObject();
+        String[] returnArray = new String[max];
         JsonArray multipleQuestions = parsed.getAsJsonArray("question");
         for (JsonElement question : multipleQuestions) {
-            JsonObject element = question.getAsJsonObject();
-            element.get("correct_answer").getAsString();
+            for (int i = 0; i < max; i++) {
+                JsonObject element = question.getAsJsonObject();
+                returnArray[i] = element.get("question").getAsString();
+            }
         }
+        return returnArray;
     }
 
     /**
-     * get the right answer.
+     * return array of right answers.
      * @param json
      * comment.
+     * @return
+     * comment.
      */
-    public void getAnswer(final String json) {
+    public String[] getAnswer(final String json) {
         JsonParser jsonParser = new JsonParser();
         JsonObject parsed = jsonParser.parse(json).getAsJsonObject();
+        String[] returnArray = new String[max];
         JsonArray multipleQuestions = parsed.getAsJsonArray("question");
         for (JsonElement question : multipleQuestions) {
-            JsonObject element = question.getAsJsonObject();
-            element.get("correct_answer").getAsString();
+            for (int i = 0; i < max; i++) {
+                JsonObject element = question.getAsJsonObject();
+                returnArray[i] = element.get("correct_answer").getAsString();
+            }
         }
+        return returnArray;
     }
 
     /**
-     * return wrong answer array.
+     * return array of wrong answers.
      * @param json
      * comment.
+     * @return
+     * comment.
      */
-    public void getWrongAnswers(final String json) {
+    public String[] getWrongAnswers(final String json) {
         JsonParser jsonParser = new JsonParser();
         JsonObject parsed = jsonParser.parse(json).getAsJsonObject();
         JsonArray multipleQuestions = parsed.getAsJsonArray("question");
+        String[] returnArray = new String[max];
         for (JsonElement question : multipleQuestions) {
             JsonObject element = question.getAsJsonObject();
             JsonArray wrongAnswersJson = element.getAsJsonArray("incorrect_answers").getAsJsonArray();
             String[] wrongAnswers = new String[wrongAnswersJson.size()];
-            for (int i = 0; i < wrongAnswersJson.size(); i++) {
+            for (int i = 0; i < max; i++) {
                 String wrongAnswer = wrongAnswersJson.get(i).getAsString();
                 wrongAnswers[i] = wrongAnswer;
+                returnArray = wrongAnswers;
             }
         }
+        return returnArray;
     }
+
+    /**
+     * comment.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,9 +151,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
      * if wrong answer is pressed.
      */
     public void displayWrong1() {
-        String placeholder = "";
         final String words = "Wrong answer!";
-        getWrongAnswers(placeholder);
         final TextView changingText = (TextView) findViewById(R.id.wrongAnswer);
         Button changeTextButton = (Button) findViewById(R.id.answer1);
         Button appear = (Button) findViewById(R.id.next_question);
@@ -142,7 +174,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
      * if wrong answer is pressed.
      */
     public void displayWrong2() {
-        final String words = "Wrong answer again!";
+        final String words = "Wrong answer!";
         final TextView changingText = (TextView) findViewById(R.id.wrongAnswer);
         Button changeTextButton = (Button) findViewById(R.id.answer2);
         Button appear = (Button) findViewById(R.id.next_question);
@@ -190,6 +222,12 @@ public class DisplayMessageActivity extends AppCompatActivity {
      */
     public void displayRight() {
         final String words = "Correct!";
+        String b = "answer";
+        String[] a = getQuestion(b);
+        String[] c = getWrongAnswers(b);
+        String[] d = getAnswer(b);
+        TextView generateQ = (TextView) findViewById(R.id.serious);
+        generateQ.setText(a[counter]);
         final TextView changingText = (TextView) findViewById(R.id.wrongAnswer);
         Button changeTextButton = (Button) findViewById(R.id.answer3);
         Button appear = (Button) findViewById(R.id.next_question);
@@ -197,6 +235,11 @@ public class DisplayMessageActivity extends AppCompatActivity {
         Button answer2 = (Button) findViewById(R.id.answer4);
         Button answer3 = (Button) findViewById(R.id.answer2);
         appear.setVisibility(View.INVISIBLE);
+        answer1.setText(c[counter]);
+        answer2.setText(c[counter + 1]);
+        answer3.setText(c[counter + 2]);
+        changeTextButton.setText(d[counter]);
+        counter++;
         changeTextButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(final View v) {
                 changingText.setText(words);
@@ -208,5 +251,4 @@ public class DisplayMessageActivity extends AppCompatActivity {
             }
         });
     }
-
 }
