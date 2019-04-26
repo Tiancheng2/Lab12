@@ -1,7 +1,6 @@
 package edu.illinois.cs.cs125.spring2019.lab12;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,28 +11,27 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.view.View;
-import android.view.MenuItem;
-import android.view.Menu;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonObject;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static android.widget.LinearLayout.*;
 
 /**
  * Main class for our UI design lab.
  */
 
 public final class MainActivity extends AppCompatActivity {
-    /** Default logging tag for messages from the main activity. */
+    /**
+     * Default logging tag for messages from the main activity.
+     */
     private static final String TAG = "Lab12:Main";
-    /** Request queue for our API requests. */
+    /**
+     * Request queue for our API requests.
+     */
     private static RequestQueue requestQueue;
 
     /**
@@ -57,11 +55,16 @@ public final class MainActivity extends AppCompatActivity {
         startAPICall(ipAddress);*/
 
     }
-
+    /**
+     * comment.
+     * @param view
+     * comment.
+     */
     public void sendMessage(final View view) {
         Intent newPage = new Intent(this, DisplayMessageActivity.class);
         startActivity(newPage);
     }
+
     /**
      * Run when this activity is no longer visible.
      */
@@ -80,7 +83,7 @@ public final class MainActivity extends AppCompatActivity {
         try {
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                     Request.Method.GET,
-                    "https://ipinfo.io/" + ipAddress + "/json",
+                    "https://opentdb.com/api.php?amount=50",
                     null,
                     new Response.Listener<JSONObject>() {
                         @Override
@@ -89,7 +92,7 @@ public final class MainActivity extends AppCompatActivity {
                         }
                     }, new Response.ErrorListener() {
                         @Override
-                        public void onErrorResponse(final VolleyError error) {
+                public void onErrorResponse(final VolleyError error) {
                             Log.e(TAG, error.toString());
                         }
                     });
@@ -99,6 +102,7 @@ public final class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
     /**
      * Handle the response from our IP geolocation API.
      *
@@ -109,11 +113,12 @@ public final class MainActivity extends AppCompatActivity {
             Log.d(TAG, response.toString(2));
             // Example of how to pull a field off the returned JSON object
             Log.i(TAG, response.get("hostname").toString());
-        } catch (JSONException ignored) { }
+        } catch (JSONException ignored) {
+        }
     }
+
     /**
-     * @param json
-     * gets Json Information
+     * @param json gets Json Information
      * @return prettyJson
      */
     public String getJson(final java.lang.String json) {
@@ -123,5 +128,4 @@ public final class MainActivity extends AppCompatActivity {
         String prettyJson = pretty.toJson(json);
         return prettyJson;
     }
-
 }
