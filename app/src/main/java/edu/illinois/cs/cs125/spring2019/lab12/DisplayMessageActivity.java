@@ -35,6 +35,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
      * @param json
      * comment.
      */
+
     public void jsonParsing(final String json) {
         try {
             JsonParser jsonParser = new JsonParser();
@@ -235,11 +236,6 @@ public class DisplayMessageActivity extends AppCompatActivity {
         Button answer2 = (Button) findViewById(R.id.answer4);
         Button answer3 = (Button) findViewById(R.id.answer2);
         appear.setVisibility(View.INVISIBLE);
-        answer1.setText(c[counter]);
-        answer2.setText(c[counter + 1]);
-        answer3.setText(c[counter + 2]);
-        changeTextButton.setText(d[counter]);
-        counter++;
         changeTextButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(final View v) {
                 changingText.setText(words);
