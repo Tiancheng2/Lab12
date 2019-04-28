@@ -58,6 +58,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
      * all questions size.
      */
     private static RequestQueue requestQueue;
+
     /**
      * comment.
      * @param savedInstanceState
@@ -65,56 +66,48 @@ public class DisplayMessageActivity extends AppCompatActivity {
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_display_message);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setContentView(R.layout.content_display_message);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
         display();
-        displayWrong2();
-        displayWrong3();
-        displayRight();
     }
     /**
+     * @param i for number
      * parse json given by api.
      * comment.
      */
-
-    public void jsonParse() {
+/*
+    public void jsonParse(final int i) {
         String url = "https://opentdb.com/api.php?amount=50";
-        textViewResult = findViewById(R.id.serious);
-        Button button = findViewById(R.id.answer1);
+        //textViewResult = findViewById(R.id.question);
+        final TextView changing1Text = (TextView) findViewById(R.id.riddle);
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(final JSONObject response) {
                         try {
                             JSONArray jsonArray = response.getJSONArray("results");
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                JSONObject results = jsonArray.getJSONObject(i);
-                                question[i] = results.getString("question");
-                                answer[i] = results.getString("correct_answer");
-                                //incorrect[i] = results.get("incorrect_answers");
-                            }
+                            JSONObject results = jsonArray.getJSONObject(i);
+                            //System.out.println(results);
+                            question[i] = results.getString("question");
+                            answer[i] = results.getString("correct_answer");
+                            final TextView changing1Text = (TextView) findViewById(R.id.riddle);
+                            System.out.println(changing1Text);
+                            changing1Text.setText(question[i]);
+
+                            //incorrect[i] = results.get("incorrect_answers");
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
+
                 }, new Response.ErrorListener() {
-                    @Override
+            @Override
             public void onErrorResponse(final VolleyError error) {
-                        error.printStackTrace();
-                        }
-                });
+                error.printStackTrace();
+            }
+        });
         requestQueue.add(request);
-    }
+    }*/
     /**
      * if wrong answer is pressed.
      */
@@ -126,10 +119,6 @@ public class DisplayMessageActivity extends AppCompatActivity {
         Button answer1 = (Button) findViewById(R.id.answer2);
         Button answer2 = (Button) findViewById(R.id.answer3);
         Button answer3 = (Button) findViewById(R.id.answer4);
-        jsonParse();
-        for (int i = 0; i < testsize; i++) {
-            correct.setText(question[i]);
-        }
         appear.setVisibility(View.INVISIBLE);
         correct.setOnClickListener(new View.OnClickListener() {
             public void onClick(final View v) {
@@ -142,74 +131,5 @@ public class DisplayMessageActivity extends AppCompatActivity {
             }
         });
     }
-    /**
-     * if wrong answer is pressed.
-     */
-    public void displayWrong2() {
-        final String wronganswer = "Incorrect";
-        final TextView changingText = (TextView) findViewById(R.id.wrongAnswer);
-        Button changeTextButton = (Button) findViewById(R.id.answer2);
-        Button appear = (Button) findViewById(R.id.next_question);
-        Button answer1 = (Button) findViewById(R.id.answer1);
-        Button answer2 = (Button) findViewById(R.id.answer3);
-        Button answer3 = (Button) findViewById(R.id.answer4);
-        appear.setVisibility(View.INVISIBLE);
-        changeTextButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(final View v) {
-                changingText.setText(wronganswer);
-                appear.setVisibility(View.VISIBLE);
-                answer1.setEnabled(false);
-                answer2.setEnabled(false);
-                answer3.setEnabled(false);
-                changeTextButton.setEnabled(false);
-            }
-        });
-    }
-    /**
-     * if wrong answer is pressed.
-     */
-    public void displayWrong3() {
-        final String words = "U dumb!";
-        final TextView changingText = (TextView) findViewById(R.id.wrongAnswer);
-        Button changeTextButton = (Button) findViewById(R.id.answer4);
-        Button appear = (Button) findViewById(R.id.next_question);
-        appear.setVisibility(View.INVISIBLE);
-        Button answer1 = (Button) findViewById(R.id.answer1);
-        Button answer2 = (Button) findViewById(R.id.answer3);
-        Button answer3 = (Button) findViewById(R.id.answer2);
-        changeTextButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(final View v) {
-                changingText.setText(words);
-                appear.setVisibility(View.VISIBLE);
-                answer1.setEnabled(false);
-                answer2.setEnabled(false);
-                answer3.setEnabled(false);
-                changeTextButton.setEnabled(false);
-            }
-        });
-    }
 
-    /**
-     * if the right answer if pressed.
-     */
-    public void displayRight() {
-        final String words = "Correct!";
-        final TextView changingText = (TextView) findViewById(R.id.wrongAnswer);
-        Button changeTextButton = (Button) findViewById(R.id.answer3);
-        Button appear = (Button) findViewById(R.id.next_question);
-        Button answer1 = (Button) findViewById(R.id.answer1);
-        Button answer2 = (Button) findViewById(R.id.answer4);
-        Button answer3 = (Button) findViewById(R.id.answer2);
-        appear.setVisibility(View.INVISIBLE);
-        changeTextButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(final View v) {
-                changingText.setText(words);
-                appear.setVisibility(View.VISIBLE);
-                answer1.setEnabled(false);
-                answer2.setEnabled(false);
-                answer3.setEnabled(false);
-                changeTextButton.setEnabled(false);
-            }
-        });
-    }
 }
