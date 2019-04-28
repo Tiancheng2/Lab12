@@ -9,121 +9,55 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 /**
  * Questions screen.
  */
 public class DisplayMessageActivity extends AppCompatActivity {
     /**
-     * comment.
+     * counter.
      */
-    private int counter = 0;
+    private TextView textViewResult;
+    /**
+     * max questions.
+     */
+    private final int testsize = 10;
     /**
      * comment.
      */
-    private final int max = 50;
+    private final int max = 3;
     /**
-     * comment.
-     */
-    private final int constant = 0;
-    /**
-     * parse json given by api.
-     * @param json
-     * comment.
+     * Request queue for our API requests.
      */
 
-    public void jsonParsing(final String json) {
-        try {
-            JsonParser jsonParser = new JsonParser();
-            JsonObject parsed = jsonParser.parse(json).getAsJsonObject();
-            JsonArray multipleQuestions = parsed.getAsJsonArray("question");
-            for (JsonElement question : multipleQuestions) {
-                JsonObject element = question.getAsJsonObject();
-                String questions = element.get("question").getAsString();
-                String rightAnswer = element.get("correct_answer").getAsString();
-                JsonArray wrongAnswersJson = element.getAsJsonArray("incorrect_answers").getAsJsonArray();
-                String[] wrongAnswers = new String[wrongAnswersJson.size()];
-                for (int i = 0; i < wrongAnswersJson.size(); i++) {
-                    String wrongAnswer = wrongAnswersJson.get(i).getAsString();
-                    wrongAnswers[i] = wrongAnswer;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
+    private final int size = 50;
     /**
-     * return array of questions.
-     * @param json
-     * comment.
-     * @return
      * comment.
      */
-    public String[] getQuestion(final String json) {
-        JsonParser jsonParser = new JsonParser();
-        JsonObject parsed = jsonParser.parse(json).getAsJsonObject();
-        String[] returnArray = new String[max];
-        JsonArray multipleQuestions = parsed.getAsJsonArray("question");
-        for (JsonElement question : multipleQuestions) {
-            for (int i = 0; i < max; i++) {
-                JsonObject element = question.getAsJsonObject();
-                returnArray[i] = element.get("question").getAsString();
-            }
-        }
-        return returnArray;
-    }
-
+    private String[][] incorrect = new String[size][max];
     /**
-     * return array of right answers.
-     * @param json
-     * comment.
-     * @return
      * comment.
      */
-    public String[] getAnswer(final String json) {
-        JsonParser jsonParser = new JsonParser();
-        JsonObject parsed = jsonParser.parse(json).getAsJsonObject();
-        String[] returnArray = new String[max];
-        JsonArray multipleQuestions = parsed.getAsJsonArray("question");
-        for (JsonElement question : multipleQuestions) {
-            for (int i = 0; i < max; i++) {
-                JsonObject element = question.getAsJsonObject();
-                returnArray[i] = element.get("correct_answer").getAsString();
-            }
-        }
-        return returnArray;
-    }
-
+    private String[] question = new String[size];
     /**
-     * return array of wrong answers.
-     * @param json
-     * comment.
-     * @return
      * comment.
      */
-    public String[] getWrongAnswers(final String json) {
-        JsonParser jsonParser = new JsonParser();
-        JsonObject parsed = jsonParser.parse(json).getAsJsonObject();
-        JsonArray multipleQuestions = parsed.getAsJsonArray("question");
-        String[] returnArray = new String[max];
-        for (JsonElement question : multipleQuestions) {
-            JsonObject element = question.getAsJsonObject();
-            JsonArray wrongAnswersJson = element.getAsJsonArray("incorrect_answers").getAsJsonArray();
-            String[] wrongAnswers = new String[wrongAnswersJson.size()];
-            for (int i = 0; i < max; i++) {
-                String wrongAnswer = wrongAnswersJson.get(i).getAsString();
-                wrongAnswers[i] = wrongAnswer;
-                returnArray = wrongAnswers;
-            }
-        }
-        return returnArray;
-    }
+    private String[] answer = new String[size];
 
+    /**
+     * all questions size.
+     */
+    private static RequestQueue requestQueue;
     /**
      * comment.
      * @param savedInstanceState
@@ -143,31 +77,68 @@ public class DisplayMessageActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-        displayWrong1();
+        display();
         displayWrong2();
         displayWrong3();
         displayRight();
     }
     /**
+     * parse json given by api.
+     * comment.
+     */
+
+    public void jsonParse() {
+        String url = "https://opentdb.com/api.php?amount=50";
+        textViewResult = findViewById(R.id.serious);
+        Button button = findViewById(R.id.answer1);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(final JSONObject response) {
+                        try {
+                            JSONArray jsonArray = response.getJSONArray("results");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject results = jsonArray.getJSONObject(i);
+                                question[i] = results.getString("question");
+                                answer[i] = results.getString("correct_answer");
+                                //incorrect[i] = results.get("incorrect_answers");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+            public void onErrorResponse(final VolleyError error) {
+                        error.printStackTrace();
+                        }
+                });
+        requestQueue.add(request);
+    }
+    /**
      * if wrong answer is pressed.
      */
-    public void displayWrong1() {
+    public void display() {
         final String words = "Wrong answer!";
         final TextView changingText = (TextView) findViewById(R.id.wrongAnswer);
-        Button changeTextButton = (Button) findViewById(R.id.answer1);
+        Button correct = (Button) findViewById(R.id.answer1);
         Button appear = (Button) findViewById(R.id.next_question);
         Button answer1 = (Button) findViewById(R.id.answer2);
         Button answer2 = (Button) findViewById(R.id.answer3);
         Button answer3 = (Button) findViewById(R.id.answer4);
+        jsonParse();
+        for (int i = 0; i < testsize; i++) {
+            correct.setText(question[i]);
+        }
         appear.setVisibility(View.INVISIBLE);
-        changeTextButton.setOnClickListener(new View.OnClickListener() {
+        correct.setOnClickListener(new View.OnClickListener() {
             public void onClick(final View v) {
                 changingText.setText(words);
                 appear.setVisibility(View.VISIBLE);
                 answer1.setEnabled(false);
                 answer2.setEnabled(false);
                 answer3.setEnabled(false);
-                changeTextButton.setEnabled(false);
+                correct.setEnabled(false);
             }
         });
     }
@@ -175,7 +146,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
      * if wrong answer is pressed.
      */
     public void displayWrong2() {
-        final String words = "Wrong answer!";
+        final String wronganswer = "Incorrect";
         final TextView changingText = (TextView) findViewById(R.id.wrongAnswer);
         Button changeTextButton = (Button) findViewById(R.id.answer2);
         Button appear = (Button) findViewById(R.id.next_question);
@@ -185,7 +156,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
         appear.setVisibility(View.INVISIBLE);
         changeTextButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(final View v) {
-                changingText.setText(words);
+                changingText.setText(wronganswer);
                 appear.setVisibility(View.VISIBLE);
                 answer1.setEnabled(false);
                 answer2.setEnabled(false);
@@ -223,12 +194,6 @@ public class DisplayMessageActivity extends AppCompatActivity {
      */
     public void displayRight() {
         final String words = "Correct!";
-        String b = "answer";
-        String[] a = getQuestion(b);
-        String[] c = getWrongAnswers(b);
-        String[] d = getAnswer(b);
-        TextView generateQ = (TextView) findViewById(R.id.serious);
-        generateQ.setText(a[counter]);
         final TextView changingText = (TextView) findViewById(R.id.wrongAnswer);
         Button changeTextButton = (Button) findViewById(R.id.answer3);
         Button appear = (Button) findViewById(R.id.next_question);
