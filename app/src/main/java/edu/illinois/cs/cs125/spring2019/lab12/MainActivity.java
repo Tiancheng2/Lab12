@@ -105,7 +105,7 @@ public final class MainActivity extends AppCompatActivity {
      */
 
     public void jsonParse(final int x) {
-        String url = "https://api.myjson.com/bins/bnpgw";
+        String url = "https://api.myjson.com/bins/j6v1k";
         setContentView(R.layout.content_display_message);
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
