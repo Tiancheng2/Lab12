@@ -12,7 +12,7 @@
     android:background="#48c9b0"
     tools:showIn="@layout/activity_display_message">
 
-    <EditText
+    <TextView
         android:id="@+id/riddle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

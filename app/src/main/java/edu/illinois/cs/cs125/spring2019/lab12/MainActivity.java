@@ -1,9 +1,7 @@
 package edu.illinois.cs.cs125.spring2019.lab12;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -26,6 +24,10 @@ import org.json.JSONObject;
 
 public final class MainActivity extends AppCompatActivity {
     /**
+     * bob.
+     */
+    private static int counter = 0;
+    /**
      * comment.
      */
     private TextView textViewResult;
@@ -36,18 +38,25 @@ public final class MainActivity extends AppCompatActivity {
     /**
      * comment.
      */
+    private final int hi = 2;
+    /**
+     * comment.
+     */
     private final int constant = 0;
+    /**
+     * comment.
+     */
     private final int testsize = 10;
 
     /**
      * Request queue for our API requests.
      */
 
-    private final int size = 50;
+    private final int size = 10;
     /**
      * comment.
      */
-    private String[][] incorrect = new String[size][max];
+    private String[] incorrect = new String[size];
     /**
      * comment.
      */
@@ -80,60 +89,23 @@ public final class MainActivity extends AppCompatActivity {
         Button button = (Button) findViewById(R.id.start);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                jsonParse(0);
-                openActivity2();
+            public void onClick(final View v) {
+                jsonParse(counter);
+                counter++;
             }
         });
     }
 
     /**
      * comment.
-     * comment.
-     */
-    public void openActivity2() {
-        Intent newPage = new Intent(this, DisplayMessageActivity.class);
-        startActivity(newPage);
-    }
-
-
-    /**
-     * Make a call to the IP geolocation API.
-     *
-     * @param ipAddress IP address to look up
-     */
-
-    void startAPICall(final String ipAddress) {
-        try {
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                    Request.Method.GET,
-                    "https://opentdb.com/api.php?amount=50",
-                    null,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(final JSONObject response) {
-                            apiCallDone(response);
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                public void onErrorResponse(final VolleyError error) {
-                            Log.e(TAG, error.toString());
-                        }
-                    });
-            jsonObjectRequest.setShouldCache(false);
-            requestQueue.add(jsonObjectRequest);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    /**
-     * @param i for number
+     * @param x
      * parse json given by api.
+     * used the api given by https://opentdb.com/api.php?amount=50, converted into easy to read text from myjson.com.
      * comment.
      */
 
-    public void jsonParse(final int i) {
-        String url = "https://opentdb.com/api.php?amount=50";
+    public void jsonParse(final int x) {
+        String url = "https://api.myjson.com/bins/bnpgw";
         setContentView(R.layout.content_display_message);
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
@@ -141,38 +113,103 @@ public final class MainActivity extends AppCompatActivity {
                     public void onResponse(final JSONObject response) {
                         try {
                             JSONArray jsonArray = response.getJSONArray("results");
-                            JSONObject results = jsonArray.getJSONObject(i);
+                            JSONObject results = jsonArray.getJSONObject(x);
+                            question[x] = results.getString("question");
+                            answer[x] = results.getString("correct_answer");
                             //System.out.println(results);
-                            question[i] = results.getString("question");
-                            answer[i] = results.getString("correct_answer");
                             final TextView changing1Text = (TextView) findViewById(R.id.riddle);
-                            changing1Text.setText(question[i]);
-                            //incorrect[i] = results.get("incorrect_answers");
+                            final Button answer3 = findViewById(R.id.answer3);
+                            answer3.setText(answer[x]);
+                            changing1Text.setText(question[x]);
+                            incorrect[x] = results.getString("incorrect_answers");
+                            String a = incorrect[x].replace("[", "");
+                            String b = a.replace("]", "");
+                            String c = b.replace("\"", "");
+                            String[] newIncorrect = c.split(",");
+                            final Button answer1 = findViewById(R.id.answer1);
+                            final Button answer2 = findViewById(R.id.answer2);
+                            final Button answer4 = findViewById(R.id.answer4);
+                            answer1.setText(newIncorrect[0]);
+                            answer2.setText(newIncorrect[1]);
+                            answer4.setText(newIncorrect[2]);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
-
                 }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(final VolleyError error)
-            {
-                error.printStackTrace();
+                    @Override
+                    public void onErrorResponse(final VolleyError error) {
+                        error.printStackTrace();
+                        }
+                });
+        requestQueue.add(request);
+        final String words = "correct!";
+        final String wow = "wrong!";
+        final TextView changingText = (TextView) findViewById(R.id.wrongAnswer);
+        Button correct = (Button) findViewById(R.id.answer3);
+        Button appear = (Button) findViewById(R.id.next_question);
+        Button answer1 = (Button) findViewById(R.id.answer2);
+        Button answer2 = (Button) findViewById(R.id.answer1);
+        Button answer3 = (Button) findViewById(R.id.answer4);
+        appear.setVisibility(View.INVISIBLE);
+        answer1.setOnClickListener(new View.OnClickListener() {
+            public void onClick(final View v) {
+                changingText.setText(wow);
+                appear.setVisibility(View.VISIBLE);
+                answer1.setEnabled(false);
+                answer2.setEnabled(false);
+                answer3.setEnabled(false);
+                correct.setEnabled(false);
             }
         });
-        requestQueue.add(request);
-    }
-    /**
-     * Handle the response from our IP geolocation API.
-     *
-     * @param response response from our IP geolocation API.
-     */
-    void apiCallDone(final JSONObject response) {
-        try {
+        answer2.setOnClickListener(new View.OnClickListener() {
+            public void onClick(final View v) {
+                changingText.setText(wow);
+                appear.setVisibility(View.VISIBLE);
+                answer1.setEnabled(false);
+                answer2.setEnabled(false);
+                answer3.setEnabled(false);
+                correct.setEnabled(false);
+            }
+        });
+        answer3.setOnClickListener(new View.OnClickListener() {
+            public void onClick(final View v) {
+                changingText.setText(wow);
+                appear.setVisibility(View.VISIBLE);
+                answer1.setEnabled(false);
+                answer2.setEnabled(false);
+                answer3.setEnabled(false);
+                correct.setEnabled(false);
+            }
+        });
+        correct.setOnClickListener(new View.OnClickListener() {
+            public void onClick(final View v) {
+                changingText.setText(words);
+                appear.setVisibility(View.VISIBLE);
+                answer1.setEnabled(false);
+                answer2.setEnabled(false);
+                answer3.setEnabled(false);
+                correct.setEnabled(false);
+            }
+        });
+        appear.setOnClickListener(new View.OnClickListener() {
+            public void onClick(final View v) {
+                counter++;
+                jsonParse(counter);
+            }
+            /**
+             * Handle the response from our IP geolocation API.
+             *
+             * @param response response from our IP geolocation API.
+            void apiCallDone(final JSONObject response) {
+            try {
             Log.d(TAG, response.toString(2));
             // Example of how to pull a field off the returned JSON object
             Log.i(TAG, response.get("hostname").toString());
-        } catch (JSONException ignored) {
-        }
+            } catch (JSONException ignored) {
+            }
+            }
+             */
+        });
     }
 }
